@@ -1,22 +1,27 @@
+using System;
 using System.Collections;
 using UnityEngine;
-[RequireComponent(typeof(Rigidbody))]
+using Random = UnityEngine.Random;
 
+[RequireComponent(typeof(Rigidbody))]
 public class Cube : MonoBehaviour
 {
     private int _lifetime;
     private bool _isCollision;
+    private Action<Cube> _killAction;
 
-    public void Initialize(int lifetime)
+    public void Initialize(int lifetime, Action<Cube> killAction)
     {
         _lifetime = lifetime;
+        _killAction = killAction;
+        _isCollision = false;
     }
 
     private IEnumerator TimerToDeath()
     {
         yield return new WaitForSeconds(_lifetime);
 
-        Destroy(gameObject);
+        _killAction?.Invoke(this);
     }
 
     private void OnCollisionEnter(Collision collision)
@@ -33,5 +38,5 @@ public class Cube : MonoBehaviour
     }
 
     private void SetRandomColor() =>
-          GetComponent<Renderer>().material.color = Random.ColorHSV();
+        GetComponent<Renderer>().material.color = Random.ColorHSV();
 }
